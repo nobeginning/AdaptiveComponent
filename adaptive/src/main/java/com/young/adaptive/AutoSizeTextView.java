@@ -13,14 +13,17 @@ import static com.young.adaptive.AdaptiveComponentKt.TAG_TEXT_SIZE_AUTO_LAYOUT;
 public final class AutoSizeTextView extends android.support.v7.widget.AppCompatTextView {
     public AutoSizeTextView(Context context) {
         super(context);
+        addAutoSizedTag();
     }
 
     public AutoSizeTextView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
+        addAutoSizedTag();
     }
 
     public AutoSizeTextView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        addAutoSizedTag();
     }
 
     private void addAutoSizedTag(){

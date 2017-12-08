@@ -7,6 +7,7 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.DisplayMetrics
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
@@ -44,7 +45,14 @@ fun <T:TextView> T.setAdaptiveTextSize(pxSize: Float) {
 fun <T : Activity> AdaptiveComponent<T>.setContentView(activity: T): View =
         createView(AdaptiveLayoutContext(activity, activity, true))
 
-open class AdaptiveLayoutContext<out T>(
+class LayoutAssistant {
+    fun setContentLayout(activity: Activity, layoutId: Int) {
+        val layout = LayoutInflater.from(activity).inflate(layoutId, null)
+        AdaptiveLayoutContext(activity, activity, true).addView(layout, null)
+    }
+}
+
+private class AdaptiveLayoutContext<out T>(
         override val ctx: Context,
         override val owner: T,
         private val setContentView: Boolean
@@ -57,6 +65,7 @@ open class AdaptiveLayoutContext<out T>(
         get() = myView ?: throw IllegalStateException("View was not set previously")
 
     override fun addView(view: View?, params: ViewGroup.LayoutParams?) {
+        println("UI: Start addView")
         if (view == null) return
 
         if (myView != null) {

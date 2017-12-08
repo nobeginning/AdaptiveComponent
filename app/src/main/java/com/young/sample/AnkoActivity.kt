@@ -3,10 +3,8 @@ package com.young.sample
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
-import android.os.Build
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.view.Gravity
+import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.view.ViewGroup
 import com.young.adaptive.*
@@ -30,6 +28,7 @@ class AnkoActivity : AppCompatActivity() {
 
 class UI : AdaptiveComponent<AnkoActivity> {
     override fun createView(ui: AnkoContext<AnkoActivity>): View {
+        println("UI: Start create view")
         return with(ui) {
             verticalLayout {
                 appBarLayout {
