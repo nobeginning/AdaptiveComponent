@@ -32,6 +32,11 @@ class LayoutAssistant {
         val layout = LayoutInflater.from(activity).inflate(layoutId, null)
         AdaptiveLayoutContext(activity, activity, true).addView(layout, null)
     }
+
+    fun autoLayout(context: Context, parentView: ViewGroup?, layoutId: Int): View {
+        val layout = LayoutInflater.from(context).inflate(layoutId, parentView, false)
+        return AdaptiveLayoutContext(context, context, false).autoLayout(context, layout)
+    }
 }
 
 interface AdaptiveViewManager<out T> : ViewManager {
@@ -78,10 +83,8 @@ class AdaptiveLayoutContext<out T>(
     }
 
     private fun doAddView(context: Context, view: View) {
-        val windowManager:WindowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
-        windowManager.defaultDisplay.getMetrics(displayMetrics)
         when (context) {
-            is Activity -> context.setContentView(autoLayout(view))
+            is Activity -> context.setContentView(autoLayout(context, view))
             is ContextWrapper -> doAddView(context.baseContext, view)
             else -> throw IllegalStateException("Context is not an Activity, can't set content view")
         }
@@ -113,7 +116,9 @@ class AdaptiveLayoutContext<out T>(
     private var metaData: Bundle? = null
 
 
-    private fun autoLayout(view: View): View {
+    fun autoLayout(context: Context, view: View): View {
+        val windowManager: WindowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+        windowManager.defaultDisplay.getMetrics(displayMetrics)
         val params: ViewGroup.LayoutParams? = view.layoutParams
         val screenWidth = displayMetrics.widthPixels
         val screenHeight = displayMetrics.heightPixels
@@ -126,7 +131,7 @@ class AdaptiveLayoutContext<out T>(
             val childCount = view.childCount
             (0 until childCount)
                     .map { view.getChildAt(it) }
-                    .forEach { autoLayout(it) }
+                    .forEach { autoLayout(context, it) }
         }
         return view
     }
@@ -166,7 +171,7 @@ class AdaptiveLayoutContext<out T>(
     private fun autoLayoutText(view: View, screenWidth: Int, screenHeight: Int) {
         if (view is TextView) {
             val textSize = view.textSize
-            view.setTextSize(TypedValue.COMPLEX_UNIT_PX,calculate(designHeight, screenHeight, textSize))
+            view.setTextSize(TypedValue.COMPLEX_UNIT_PX, calculate(designHeight, screenHeight, textSize))
         }
     }
 
