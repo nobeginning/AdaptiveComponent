@@ -6,11 +6,11 @@
     android:layout_height="match_parent"
     tools:context="com.young.sample.NormalActivity">
 
-    <com.young.adaptive.AutoSizeTextView
+    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="AutoSized"
-        android:textSize="20px"/>
+        android:textSize="30px"/>
 
     <Button
         android:layout_width="wrap_content"

@@ -14,6 +14,7 @@ import android.widget.TextView
 /**
  * Created by Young on 2017/9/27.
  */
+private const val DEBUG = true
 
 const val PX_1: Int = -10
 const val PX_LINE: Int = -10
@@ -22,18 +23,9 @@ const val MATCH_PARENT: Int = ViewGroup.LayoutParams.MATCH_PARENT
 
 private const val PX_UNIT = 1
 
-@Deprecated("Use #R.id.text_view_auto_size stead")
-const val KEY_TAG_TEXT_SIZE_AUTO_LAYOUT: Int = 0x7fffffff
-
-const val TAG_TEXT_SIZE_AUTO_LAYOUT: String = "YES"
 private const val META_NAME_DESIGN_WIDTH: String = "com.young.adaptive.designWidth"
 private const val META_NAME_DESIGN_HEIGHT: String = "com.young.adaptive.designHeight"
 private const val LOG_TAG: String = "AdaptiveComponent"
-
-fun <T : TextView> T.setAdaptiveTextSize(pxSize: Float) {
-    this.setTag(R.id.text_view_auto_size, TAG_TEXT_SIZE_AUTO_LAYOUT)
-    this.setTextSize(TypedValue.COMPLEX_UNIT_PX, pxSize)
-}
 
 class LayoutAssistant {
     fun setContentLayout(activity: Activity, layoutId: Int) {
@@ -54,11 +46,15 @@ class AdaptiveLayoutContext<out T>(
         private val setContentView: Boolean
 ) : AdaptiveViewManager<T> {
     override fun removeView(view: View?) {
-
+        if (DEBUG) {
+            println("AdaptiveLayoutContext: removeView: view -- $view")
+        }
     }
 
     override fun updateViewLayout(view: View?, params: ViewGroup.LayoutParams?) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        if (DEBUG) {
+            println("AdaptiveLayoutContext: updateViewLayout: view -- $view ; params -- $params")
+        }
     }
 
     private var myView: View? = null
@@ -68,7 +64,6 @@ class AdaptiveLayoutContext<out T>(
         get() = myView ?: throw IllegalStateException("View was not set previously")
 
     override fun addView(view: View?, params: ViewGroup.LayoutParams?) {
-        println("UI: Start addView")
         if (view == null) return
 
         if (myView != null) {
@@ -133,14 +128,6 @@ class AdaptiveLayoutContext<out T>(
                     .map { view.getChildAt(it) }
                     .forEach { autoLayout(it) }
         }
-//        else {
-//            val params = view.layoutParams
-//            val screenWidth = displayMetrics.widthPixels
-//            val screenHeight = displayMetrics.heightPixels
-//            autoLayoutPadding(view, screenWidth, screenHeight)
-//            autoLayoutText(view, screenWidth, screenHeight)
-//            autoLayoutParameters(params, screenWidth, screenHeight)
-//        }
         return view
     }
 
@@ -177,8 +164,7 @@ class AdaptiveLayoutContext<out T>(
     }
 
     private fun autoLayoutText(view: View, screenWidth: Int, screenHeight: Int) {
-        if (view is TextView
-                && TAG_TEXT_SIZE_AUTO_LAYOUT == view.getTag(R.id.text_view_auto_size)) {
+        if (view is TextView) {
             val textSize = view.textSize
             view.setTextSize(TypedValue.COMPLEX_UNIT_PX,calculate(designHeight, screenHeight, textSize))
         }
@@ -237,6 +223,6 @@ class AdaptiveLayoutContext<out T>(
         return (originValue.toDouble() * screeValue.toDouble() / designValue.toDouble()).toFloat()
     }
 
-    open protected fun alreadyHasView(): Unit = throw IllegalStateException("View is already set: $myView")
+    fun alreadyHasView(): Unit = throw IllegalStateException("View is already set: $myView")
 
 }

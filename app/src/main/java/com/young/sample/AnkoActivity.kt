@@ -5,6 +5,7 @@ import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
 import com.young.adaptive.*
@@ -49,7 +50,7 @@ class UI : AdaptiveComponent<AnkoActivity> {
 
                             textView("Hello Auto Layout Anko!") {
                                 tag = "HELLO"
-                                setAdaptiveTextSize(24f)
+                                setTextSize(TypedValue.COMPLEX_UNIT_PX, 30f)
                                 setBackgroundColor(Color.DKGRAY)
                                 setPadding(40, 10, 60, 20)
                                 setOnClickListener { toast("Clicked Text") }
@@ -67,20 +68,21 @@ class UI : AdaptiveComponent<AnkoActivity> {
                             setMargins(20, 20, 60, 30)
                         }
                         button("Click Me") {
-                            setAdaptiveTextSize(18f)
+                            setTextSize(TypedValue.COMPLEX_UNIT_PX, 18f)
                             setOnClickListener { toast("Oh, NO") }
                         }.lparams {
                             setMargins(10, 20, 30, 40)
                         }
                         button("点我试试") {
-                            setAdaptiveTextSize(18f)
+                            setTextSize(TypedValue.COMPLEX_UNIT_PX, 18f)
                             setOnClickListener { toast("试试就试试") }
                         }.lparams {
                             setMargins(40, 10, 20, 10)
                         }
-                        button("Match"){
-                            setAdaptiveTextSize(6f)
-                            leftPadding = 600
+                        textView("Match"){
+                            setTextSize(TypedValue.COMPLEX_UNIT_PX, 62f)
+                            leftPadding = 360
+                            backgroundColor = Color.BLUE
                         }.lparams(MATCH_PARENT, WRAP_CONTENT)
                     }
                 }
