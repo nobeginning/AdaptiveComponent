@@ -7,12 +7,8 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.DisplayMetrics
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.TextView
-import org.jetbrains.anko.AnkoContext
-import org.jetbrains.anko.windowManager
 
 /**
  * Created by Young on 2017/9/27.
@@ -22,10 +18,6 @@ const val PX_1: Int = -10
 const val PX_LINE: Int = -10
 const val WRAP_CONTENT: Int = ViewGroup.LayoutParams.WRAP_CONTENT
 const val MATCH_PARENT: Int = ViewGroup.LayoutParams.MATCH_PARENT
-
-interface AdaptiveComponent<in T> {
-    fun createView(ui: AnkoContext<T>): View
-}
 
 private const val PX_UNIT = 1
 
@@ -37,13 +29,10 @@ private const val META_NAME_DESIGN_WIDTH: String = "com.young.adaptive.designWid
 private const val META_NAME_DESIGN_HEIGHT: String = "com.young.adaptive.designHeight"
 private const val LOG_TAG: String = "AdaptiveComponent"
 
-fun <T:TextView> T.setAdaptiveTextSize(pxSize: Float) {
+fun <T : TextView> T.setAdaptiveTextSize(pxSize: Float) {
     this.setTag(R.id.text_view_auto_size, TAG_TEXT_SIZE_AUTO_LAYOUT)
     this.setTextSize(android.util.TypedValue.COMPLEX_UNIT_PX, pxSize)
 }
-
-fun <T : Activity> AdaptiveComponent<T>.setContentView(activity: T): View =
-        createView(AdaptiveLayoutContext(activity, activity, true))
 
 class LayoutAssistant {
     fun setContentLayout(activity: Activity, layoutId: Int) {
@@ -52,11 +41,24 @@ class LayoutAssistant {
     }
 }
 
+interface AdaptiveViewManager<out T> : ViewManager {
+    abstract val ctx: Context
+    abstract val owner: T
+    abstract val view: View
+}
+
 class AdaptiveLayoutContext<out T>(
         override val ctx: Context,
         override val owner: T,
         private val setContentView: Boolean
-) : AnkoContext<T> {
+) : AdaptiveViewManager<T> {
+    override fun removeView(view: View?) {
+
+    }
+
+    override fun updateViewLayout(view: View?, params: ViewGroup.LayoutParams?) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
 
     private var myView: View? = null
     private val displayMetrics: DisplayMetrics = DisplayMetrics()
@@ -80,7 +82,8 @@ class AdaptiveLayoutContext<out T>(
     }
 
     private fun doAddView(context: Context, view: View) {
-        ctx.windowManager.defaultDisplay.getMetrics(displayMetrics)
+        val windowManager:WindowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+        windowManager.defaultDisplay.getMetrics(displayMetrics)
         when (context) {
             is Activity -> context.setContentView(autoLayout(view))
             is ContextWrapper -> doAddView(context.baseContext, view)
@@ -89,23 +92,23 @@ class AdaptiveLayoutContext<out T>(
     }
 
     private val designWidth: Int
-            get() {
-                if (metaData==null){
-                    metaData = ctx.packageManager.getApplicationInfo(ctx.packageName, PackageManager.GET_META_DATA)?.metaData
-                }
-                return if (metaData!=null && metaData!!.containsKey(META_NAME_DESIGN_WIDTH)){
-                    metaData!!.get(META_NAME_DESIGN_WIDTH) as Int
-                } else {
-                    0
-                }
+        get() {
+            if (metaData == null) {
+                metaData = ctx.packageManager.getApplicationInfo(ctx.packageName, PackageManager.GET_META_DATA)?.metaData
             }
+            return if (metaData != null && metaData!!.containsKey(META_NAME_DESIGN_WIDTH)) {
+                metaData!!.get(META_NAME_DESIGN_WIDTH) as Int
+            } else {
+                0
+            }
+        }
 
     private val designHeight: Int
         get() {
-            if (metaData==null){
+            if (metaData == null) {
                 metaData = ctx.packageManager.getApplicationInfo(ctx.packageName, PackageManager.GET_META_DATA)?.metaData
             }
-            return if (metaData!=null && metaData!!.containsKey(META_NAME_DESIGN_HEIGHT)){
+            return if (metaData != null && metaData!!.containsKey(META_NAME_DESIGN_HEIGHT)) {
                 metaData!!.get(META_NAME_DESIGN_HEIGHT) as Int
             } else {
                 0
@@ -115,7 +118,7 @@ class AdaptiveLayoutContext<out T>(
 
 
     private fun autoLayout(view: View): View {
-        val params:ViewGroup.LayoutParams? = view.layoutParams
+        val params: ViewGroup.LayoutParams? = view.layoutParams
         val screenWidth = displayMetrics.widthPixels
         val screenHeight = displayMetrics.heightPixels
         autoLayoutPadding(view, screenWidth, screenHeight)

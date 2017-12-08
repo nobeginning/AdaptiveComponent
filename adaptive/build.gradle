@@ -30,9 +30,9 @@ dependencies {
     compile 'com.android.support:appcompat-v7:26.+'
     testCompile 'junit:junit:4.12'
     compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
-    compile "org.jetbrains.anko:anko:$anko_version"
-    compile "org.jetbrains.anko:anko-design:$anko_version"
-    compile "org.jetbrains.anko:anko-design-coroutines:$anko_version"
+//    compile "org.jetbrains.anko:anko:$anko_version"
+//    compile "org.jetbrains.anko:anko-design:$anko_version"
+//    compile "org.jetbrains.anko:anko-design-coroutines:$anko_version"
 }
 repositories {
     mavenCentral()

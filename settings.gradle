@@ -1,1 +1,1 @@
-include ':app', ':adaptive'
+include ':app', ':adaptive', ':adaptive-anko'

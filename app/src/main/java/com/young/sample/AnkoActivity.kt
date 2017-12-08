@@ -8,6 +8,8 @@ import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.view.ViewGroup
 import com.young.adaptive.*
+import com.young.anko.adaptive.AdaptiveComponent
+import com.young.anko.adaptive.setContentView
 import org.jetbrains.anko.*
 import org.jetbrains.anko.appcompat.v7.toolbar
 import org.jetbrains.anko.design.appBarLayout
