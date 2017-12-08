@@ -1,3 +1,3 @@
-adaptive anko component
+Android自适应布局解决方案
 
-基于Anko的自适应布局解决方案
+[![](https://jitpack.io/v/cunxinaimei/AdaptiveAnkoComponent.svg)](https://jitpack.io/#cunxinaimei/AdaptiveAnkoComponent)
