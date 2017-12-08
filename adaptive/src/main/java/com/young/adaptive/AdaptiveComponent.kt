@@ -27,14 +27,17 @@ interface AdaptiveComponent<in T> {
 }
 
 private const val PX_UNIT = 1
-private const val KEY_TAG_TEXT_SIZE_AUTO_LAYOUT: Int = 0x7fffffff
-private const val TAG_TEXT_SIZE_AUTO_LAYOUT: String = "YES"
+
+@Deprecated("Use #R.id.text_view_auto_size stead")
+const val KEY_TAG_TEXT_SIZE_AUTO_LAYOUT: Int = 0x7fffffff
+
+const val TAG_TEXT_SIZE_AUTO_LAYOUT: String = "YES"
 private const val META_NAME_DESIGN_WIDTH: String = "com.young.adaptive.designWidth"
 private const val META_NAME_DESIGN_HEIGHT: String = "com.young.adaptive.designHeight"
 private const val LOG_TAG: String = "AdaptiveComponent"
 
-fun TextView.setAdaptiveTextSize(pxSize: Float) {
-    this.setTag(KEY_TAG_TEXT_SIZE_AUTO_LAYOUT, TAG_TEXT_SIZE_AUTO_LAYOUT)
+fun <T:TextView> T.setAdaptiveTextSize(pxSize: Float) {
+    this.setTag(R.id.text_view_auto_size, TAG_TEXT_SIZE_AUTO_LAYOUT)
     this.setTextSize(android.util.TypedValue.COMPLEX_UNIT_PX, pxSize)
 }
 
@@ -103,19 +106,28 @@ open class AdaptiveLayoutContext<out T>(
 
 
     private fun autoLayout(view: View): View {
+        val params:ViewGroup.LayoutParams? = view.layoutParams
+        val screenWidth = displayMetrics.widthPixels
+        val screenHeight = displayMetrics.heightPixels
+        autoLayoutPadding(view, screenWidth, screenHeight)
+        autoLayoutText(view, screenWidth, screenHeight)
+        params?.apply {
+            autoLayoutParameters(params, screenWidth, screenHeight, view)
+        }
         if (view is ViewGroup) {
             val childCount = view.childCount
             (0 until childCount)
                     .map { view.getChildAt(it) }
                     .forEach { autoLayout(it) }
-        } else {
-            val params = view.layoutParams
-            val screenWidth = displayMetrics.widthPixels
-            val screenHeight = displayMetrics.heightPixels
-            autoLayoutPadding(view, screenWidth, screenHeight)
-            autoLayoutText(view, screenWidth, screenHeight)
-            autoLayoutParameters(params, screenWidth, screenHeight)
         }
+//        else {
+//            val params = view.layoutParams
+//            val screenWidth = displayMetrics.widthPixels
+//            val screenHeight = displayMetrics.heightPixels
+//            autoLayoutPadding(view, screenWidth, screenHeight)
+//            autoLayoutText(view, screenWidth, screenHeight)
+//            autoLayoutParameters(params, screenWidth, screenHeight)
+//        }
         return view
     }
 
@@ -153,13 +165,13 @@ open class AdaptiveLayoutContext<out T>(
 
     private fun autoLayoutText(view: View, screenWidth: Int, screenHeight: Int) {
         if (view is TextView
-                && TAG_TEXT_SIZE_AUTO_LAYOUT == view.getTag(KEY_TAG_TEXT_SIZE_AUTO_LAYOUT)) {
+                && TAG_TEXT_SIZE_AUTO_LAYOUT == view.getTag(R.id.text_view_auto_size)) {
             val textSize = view.textSize
             view.textSize = calculate(designHeight, screenHeight, textSize)
         }
     }
 
-    private fun autoLayoutParameters(params: ViewGroup.LayoutParams, screenWidth: Int, screenHeight: Int) {
+    private fun autoLayoutParameters(params: ViewGroup.LayoutParams, screenWidth: Int, screenHeight: Int, view: View) {
         if (params.width > 0) {
             params.width = calculate(designWidth, screenWidth, params.width)
         } else if (params.width == PX_1) {
@@ -193,6 +205,7 @@ open class AdaptiveLayoutContext<out T>(
                 params.bottomMargin = PX_UNIT
             }
         }
+        view.layoutParams = params
     }
 
     private fun calculate(designValue: Int, screeValue: Int, originValue: Int): Int {
