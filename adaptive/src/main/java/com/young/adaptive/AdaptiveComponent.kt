@@ -52,7 +52,7 @@ class LayoutAssistant {
     }
 }
 
-private class AdaptiveLayoutContext<out T>(
+class AdaptiveLayoutContext<out T>(
         override val ctx: Context,
         override val owner: T,
         private val setContentView: Boolean

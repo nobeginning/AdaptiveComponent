@@ -5,7 +5,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import com.young.adaptive.LayoutAssistant
-import com.young.adaptive.setContentLayout
 
 class NormalActivity : AppCompatActivity() {
 
