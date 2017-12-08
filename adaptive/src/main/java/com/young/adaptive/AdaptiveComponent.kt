@@ -7,6 +7,7 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.DisplayMetrics
 import android.util.Log
+import android.util.TypedValue
 import android.view.*
 import android.widget.TextView
 
@@ -31,7 +32,7 @@ private const val LOG_TAG: String = "AdaptiveComponent"
 
 fun <T : TextView> T.setAdaptiveTextSize(pxSize: Float) {
     this.setTag(R.id.text_view_auto_size, TAG_TEXT_SIZE_AUTO_LAYOUT)
-    this.setTextSize(android.util.TypedValue.COMPLEX_UNIT_PX, pxSize)
+    this.setTextSize(TypedValue.COMPLEX_UNIT_PX, pxSize)
 }
 
 class LayoutAssistant {
@@ -179,7 +180,7 @@ class AdaptiveLayoutContext<out T>(
         if (view is TextView
                 && TAG_TEXT_SIZE_AUTO_LAYOUT == view.getTag(R.id.text_view_auto_size)) {
             val textSize = view.textSize
-            view.textSize = calculate(designHeight, screenHeight, textSize)
+            view.setTextSize(TypedValue.COMPLEX_UNIT_PX,calculate(designHeight, screenHeight, textSize))
         }
     }
 
