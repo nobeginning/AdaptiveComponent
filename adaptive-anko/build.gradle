@@ -1,9 +1,11 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
+apply plugin: 'com.github.dcendents.android-maven'
+
+group='com.young.adaptive'
 
 android {
     compileSdkVersion 26
-    buildToolsVersion "26.0.1"
 
     defaultConfig {
         minSdkVersion 15
