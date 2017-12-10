@@ -6,6 +6,10 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.view.Menu
 import android.view.MenuItem
+import com.young.adaptive.AdaptiveComponent
+import com.young.adaptive.COMPONENT_PRESET_PARAMETER
+import com.young.adaptive.COMPONENT_PRESET_TEXT_SIZE
+import com.young.adaptive.component.TextSizeComponent
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
 

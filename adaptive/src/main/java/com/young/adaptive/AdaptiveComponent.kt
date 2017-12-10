@@ -5,11 +5,16 @@ import android.content.Context
 import android.content.ContextWrapper
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.support.annotation.StringDef
+import android.support.annotation.StringRes
 import android.util.DisplayMetrics
 import android.util.Log
-import android.util.TypedValue
 import android.view.*
-import android.widget.TextView
+import com.young.adaptive.component.PaddingComponent
+import com.young.adaptive.component.ParameterComponent
+import com.young.adaptive.component.TextSizeComponent
+import java.lang.annotation.RetentionPolicy
+import java.util.*
 
 /**
  * Created by Young on 2017/9/27.
@@ -21,7 +26,7 @@ const val PX_LINE: Int = -10
 const val WRAP_CONTENT: Int = ViewGroup.LayoutParams.WRAP_CONTENT
 const val MATCH_PARENT: Int = ViewGroup.LayoutParams.MATCH_PARENT
 
-private const val PX_UNIT = 1
+const val PX_UNIT = 1
 
 private const val META_NAME_DESIGN_WIDTH: String = "com.young.adaptive.designWidth"
 private const val META_NAME_DESIGN_HEIGHT: String = "com.young.adaptive.designHeight"
@@ -35,7 +40,7 @@ class LayoutAssistant {
 
     fun autoLayout(context: Context, parentView: ViewGroup?, layoutId: Int): View {
         val layout = LayoutInflater.from(context).inflate(layoutId, parentView, false)
-        return AdaptiveLayoutContext(context, context, false).autoLayout(context, layout)
+        return AdaptiveLayoutContext(context, context, false).doAutoLayout(context, layout)
     }
 }
 
@@ -45,11 +50,86 @@ interface AdaptiveViewManager<out T> : ViewManager {
     abstract val view: View
 }
 
+interface IComponent {
+    fun adaptive(view: View, screenWidth: Int, screenHeight: Int, designWidth: Int, designHeight: Int)
+}
+
+const val COMPONENT_PRESET_PADDING = "COMPONENT_PRESET_PADDING"
+const val COMPONENT_PRESET_PARAMETER = "COMPONENT_PRESET_PARAMETER"
+const val COMPONENT_PRESET_TEXT_SIZE = "COMPONENT_PRESET_TEXT_SIZE"
+
+public object AdaptiveComponent {
+
+    @StringDef(COMPONENT_PRESET_PADDING, COMPONENT_PRESET_PARAMETER, COMPONENT_PRESET_TEXT_SIZE)
+    @Retention(AnnotationRetention.SOURCE)
+    annotation class PresetComponent
+
+    private val components: LinkedList<IComponent> = LinkedList()
+    private val presetPaddingComponent: IComponent = PaddingComponent()
+    private val presetParameterComponent: IComponent = ParameterComponent()
+    private val presetTextSizeComponent: IComponent = TextSizeComponent()
+
+    init {
+        components.add(presetPaddingComponent)
+        components.add(presetParameterComponent)
+        components.add(presetTextSizeComponent)
+    }
+
+    fun initWithoutPreset() {
+        remove(presetPaddingComponent)
+        remove(presetParameterComponent)
+        remove(presetTextSizeComponent)
+    }
+
+    fun removePresetComponent(@PresetComponent component: String) {
+        when (component) {
+            COMPONENT_PRESET_PADDING -> remove(presetPaddingComponent)
+            COMPONENT_PRESET_PARAMETER -> remove(presetParameterComponent)
+            COMPONENT_PRESET_TEXT_SIZE -> remove(presetTextSizeComponent)
+        }
+    }
+
+    fun add(component: IComponent) {
+        components.add(component)
+    }
+
+    fun remove(component: IComponent) {
+        components.remove(component)
+    }
+
+    fun clear() {
+        components.clear()
+    }
+
+    fun getAllComponents(): List<IComponent> {
+        return components
+    }
+}
+
 class AdaptiveLayoutContext<out T>(
         override val ctx: Context,
         override val owner: T,
         private val setContentView: Boolean
 ) : AdaptiveViewManager<T> {
+
+    companion object {
+        fun calculate(designValue: Int, screeValue: Int, originValue: Int): Int {
+            if (designValue <= 0) {
+                Log.w(LOG_TAG, "Found design value **$designValue** is invalid. Have u forgot it?")
+                return originValue
+            }
+            return (originValue.toDouble() * screeValue.toDouble() / designValue.toDouble()).toInt()
+        }
+
+        fun calculate(designValue: Int, screeValue: Int, originValue: Float): Float {
+            if (designValue <= 0) {
+                Log.w(LOG_TAG, "Found design value **$designValue** is invalid. Have u forgot it?")
+                return originValue
+            }
+            return (originValue.toDouble() * screeValue.toDouble() / designValue.toDouble()).toFloat()
+        }
+    }
+
     override fun removeView(view: View?) {
         if (DEBUG) {
             println("AdaptiveLayoutContext: removeView: view -- $view")
@@ -84,7 +164,7 @@ class AdaptiveLayoutContext<out T>(
 
     private fun doAddView(context: Context, view: View) {
         when (context) {
-            is Activity -> context.setContentView(autoLayout(context, view))
+            is Activity -> context.setContentView(doAutoLayout(context, view))
             is ContextWrapper -> doAddView(context.baseContext, view)
             else -> throw IllegalStateException("Context is not an Activity, can't set content view")
         }
@@ -115,18 +195,21 @@ class AdaptiveLayoutContext<out T>(
         }
     private var metaData: Bundle? = null
 
-
-    fun autoLayout(context: Context, view: View): View {
+    fun doAutoLayout(context: Context, view: View): View {
         val windowManager: WindowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
         windowManager.defaultDisplay.getMetrics(displayMetrics)
-        val params: ViewGroup.LayoutParams? = view.layoutParams
+        return autoLayout(context, view)
+    }
+
+    private fun autoLayout(context: Context, view: View): View {
         val screenWidth = displayMetrics.widthPixels
         val screenHeight = displayMetrics.heightPixels
-        autoLayoutPadding(view, screenWidth, screenHeight)
-        autoLayoutText(view, screenWidth, screenHeight)
-        params?.apply {
-            autoLayoutParameters(params, screenWidth, screenHeight, view)
+
+        val components = AdaptiveComponent.getAllComponents()
+        components.forEach {
+            it.adaptive(view, screenWidth, screenHeight, designWidth, designHeight)
         }
+
         if (view is ViewGroup) {
             val childCount = view.childCount
             (0 until childCount)
@@ -134,98 +217,6 @@ class AdaptiveLayoutContext<out T>(
                     .forEach { autoLayout(context, it) }
         }
         return view
-    }
-
-    private fun autoLayoutPadding(view: View, screenWidth: Int, screenHeight: Int) {
-        var paddingLeft = 0
-        if (view.paddingLeft > 0) {
-            paddingLeft = calculate(designWidth, screenWidth, view.paddingLeft)
-        } else if (view.paddingLeft == PX_1) {
-            paddingLeft = PX_UNIT
-        }
-
-        var paddingTop = 0
-        if (view.paddingTop > 0) {
-            paddingTop = calculate(designHeight, screenHeight, view.paddingTop)
-        } else if (view.paddingTop == PX_1) {
-            paddingTop = PX_UNIT
-        }
-
-        var paddingRight = 0
-        if (view.paddingRight > 0) {
-            paddingRight = calculate(designWidth, screenWidth, view.paddingRight)
-        } else if (view.paddingRight == PX_1) {
-            paddingRight = PX_UNIT
-        }
-
-        var paddingBottom = 0
-        if (view.paddingBottom > 0) {
-            paddingBottom = calculate(designHeight, screenHeight, view.paddingBottom)
-        } else if (view.paddingBottom == PX_1) {
-            paddingBottom = PX_UNIT
-        }
-
-        view.setPadding(paddingLeft, paddingTop, paddingRight, paddingBottom)
-    }
-
-    private fun autoLayoutText(view: View, screenWidth: Int, screenHeight: Int) {
-        if (view is TextView) {
-            val textSize = view.textSize
-            view.setTextSize(TypedValue.COMPLEX_UNIT_PX, calculate(designHeight, screenHeight, textSize))
-        }
-    }
-
-    private fun autoLayoutParameters(params: ViewGroup.LayoutParams, screenWidth: Int, screenHeight: Int, view: View) {
-        if (params.width > 0) {
-            params.width = calculate(designWidth, screenWidth, params.width)
-        } else if (params.width == PX_1) {
-            params.width = PX_UNIT
-        }
-        if (params.height > 0) {
-            params.height = calculate(designHeight, screenHeight, params.height)
-        } else if (params.height == PX_1) {
-            params.height = PX_UNIT
-        }
-
-        if (params is ViewGroup.MarginLayoutParams) {
-            if (params.leftMargin > 0) {
-                params.leftMargin = calculate(designWidth, screenWidth, params.leftMargin)
-            } else if (params.leftMargin == PX_1) {
-                params.leftMargin = PX_UNIT
-            }
-            if (params.rightMargin > 0) {
-                params.rightMargin = calculate(designWidth, screenWidth, params.rightMargin)
-            } else if (params.rightMargin == PX_1) {
-                params.rightMargin = PX_UNIT
-            }
-            if (params.topMargin > 0) {
-                params.topMargin = calculate(designHeight, screenHeight, params.topMargin)
-            } else if (params.topMargin == PX_1) {
-                params.topMargin = PX_UNIT
-            }
-            if (params.bottomMargin > 0) {
-                params.bottomMargin = calculate(designHeight, screenHeight, params.bottomMargin)
-            } else if (params.bottomMargin == PX_1) {
-                params.bottomMargin = PX_UNIT
-            }
-        }
-        view.layoutParams = params
-    }
-
-    private fun calculate(designValue: Int, screeValue: Int, originValue: Int): Int {
-        if (designValue <= 0) {
-            Log.w(LOG_TAG, "Found design value **$designValue** is invalid. Have u forgot it?")
-            return originValue
-        }
-        return (originValue.toDouble() * screeValue.toDouble() / designValue.toDouble()).toInt()
-    }
-
-    private fun calculate(designValue: Int, screeValue: Int, originValue: Float): Float {
-        if (designValue <= 0) {
-            Log.w(LOG_TAG, "Found design value **$designValue** is invalid. Have u forgot it?")
-            return originValue
-        }
-        return (originValue.toDouble() * screeValue.toDouble() / designValue.toDouble()).toFloat()
     }
 
     fun alreadyHasView(): Unit = throw IllegalStateException("View is already set: $myView")

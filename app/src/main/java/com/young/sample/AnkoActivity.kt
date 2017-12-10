@@ -9,7 +9,7 @@ import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
 import com.young.adaptive.*
-import com.young.anko.adaptive.AdaptiveComponent
+import com.young.anko.adaptive.AnkoAdaptiveComponent
 import com.young.anko.adaptive.setContentView
 import org.jetbrains.anko.*
 import org.jetbrains.anko.appcompat.v7.toolbar
@@ -29,7 +29,7 @@ class AnkoActivity : AppCompatActivity() {
     }
 }
 
-class UI : AdaptiveComponent<AnkoActivity> {
+class UI : AnkoAdaptiveComponent<AnkoActivity> {
     override fun createView(ui: AnkoContext<AnkoActivity>): View {
         println("UI: Start create view")
         return with(ui) {

@@ -11,11 +11,11 @@ import org.jetbrains.anko.AnkoContext
  * Created by young on 2017/12/8.
  */
 
-interface AdaptiveComponent<in T> {
+interface AnkoAdaptiveComponent<in T> {
     fun createView(ui: AnkoContext<T>): View
 }
 
-fun <T : Activity> AdaptiveComponent<T>.setContentView(activity: T): View =
+fun <T : Activity> AnkoAdaptiveComponent<T>.setContentView(activity: T): View =
         createView(AnkoAdaptiveLayoutContext(activity, activity, true))
 
 open class AnkoAdaptiveLayoutContext<out T>(
