@@ -118,7 +118,11 @@ class AdaptiveLayoutContext<out T>(
                 Log.w(LOG_TAG, "Found design value **$designValue** is invalid. Have u forgot it?")
                 return originValue
             }
-            return (originValue.toDouble() * screeValue.toDouble() / designValue.toDouble()).toInt()
+            var result = (originValue.toDouble() * screeValue.toDouble() / designValue.toDouble()).toInt()
+            if (result<=0){
+                result = 1
+            }
+            return result
         }
 
         fun calculate(designValue: Int, screeValue: Int, originValue: Float): Float {
@@ -126,7 +130,11 @@ class AdaptiveLayoutContext<out T>(
                 Log.w(LOG_TAG, "Found design value **$designValue** is invalid. Have u forgot it?")
                 return originValue
             }
-            return (originValue.toDouble() * screeValue.toDouble() / designValue.toDouble()).toFloat()
+            var result = (originValue.toDouble() * screeValue.toDouble() / designValue.toDouble()).toFloat()
+            if (result<1f){
+                result = 1f
+            }
+            return result
         }
     }
 
