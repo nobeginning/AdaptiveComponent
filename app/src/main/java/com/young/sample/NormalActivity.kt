@@ -7,7 +7,7 @@ import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
-import com.young.adaptive.LayoutAssistant
+import com.young.adaptive.AdaptiveAssistant
 import kotlinx.android.synthetic.main.activity_normal.*
 import kotlinx.android.synthetic.main.cell_for_list.view.*
 
@@ -19,17 +19,17 @@ class NormalActivity : AppCompatActivity() {
         }
     }
 
-    val layoutAssistant:LayoutAssistant = LayoutAssistant()
+    val layoutAssistant:AdaptiveAssistant = AdaptiveAssistant()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        layoutAssistant.setContentLayout(this, R.layout.activity_normal)
+        layoutAssistant.setContentView(this, R.layout.activity_normal)
         listView.adapter = MyAdapter()
     }
 
     inner class MyAdapter: BaseAdapter() {
         override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
-            val view = convertView ?: layoutAssistant.autoLayout(this@NormalActivity, parent ,R.layout.cell_for_list)
+            val view = convertView ?: layoutAssistant.adaptive(this@NormalActivity, parent ,R.layout.cell_for_list)
 //            val tvTitle = view.findViewById<TextView>(R.id.tvTitle)
 //            val tvDesc = view.findViewById<TextView>(R.id.tvDesc)
             view.tvTitle.text = "Title -> ${getItemId(position)}"

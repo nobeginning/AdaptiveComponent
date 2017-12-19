@@ -35,8 +35,8 @@ dependencies {
     compile "org.jetbrains.anko:anko-design-coroutines:$anko_version"
     compile project(':adaptive')
     compile project(':adaptive-anko')
-//    compile 'com.github.cunxinaimei.AdaptiveAnkoComponent:adaptive-anko:0.1.7'
-//    compile 'com.github.cunxinaimei.AdaptiveAnkoComponent:adaptive:0.1.7'
+//    compile 'com.github.cunxinaimei.AdaptiveAnkoComponent:adaptive-anko:0.2.0'
+//    compile 'com.github.cunxinaimei.AdaptiveAnkoComponent:adaptive:0.2.0'
 }
 repositories {
     mavenCentral()
