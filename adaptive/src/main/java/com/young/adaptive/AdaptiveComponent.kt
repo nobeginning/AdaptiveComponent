@@ -104,8 +104,8 @@ public object AdaptiveComponent {
     }
 
     fun getDesignHeight(ctx: Context):Int{
-        if (designWidth>-1){
-            return designWidth
+        if (designHeight>-1){
+            return designHeight
         }
         if (metaData == null) {
             metaData = ctx.packageManager.getApplicationInfo(ctx.packageName, PackageManager.GET_META_DATA)?.metaData
