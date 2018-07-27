@@ -113,7 +113,7 @@ override fun getView(position: Int, convertView: View?, parent: ViewGroup?): Vie
 
 ### 图解
 
-![自适应图解](http://img.blog.csdn.net/20180205133148401?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvY3VueGluYWltZWk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
+![自适应图解](des.jpeg)
 
 ### 代码及思路介绍
 
