@@ -189,18 +189,18 @@ public object AdaptiveComponent {
 }
 
 class AdaptiveLayoutContext<out T>(
-        override val ctx: Context,
-        override val owner: T,
+        val ctx: Context,
+        val owner: T,
         private val setContentView: Boolean
-) : AdaptiveViewManager<T> {
+) {
 
-    override fun removeView(view: View?) {
+    fun removeView(view: View?) {
         if (DEBUG) {
             println("AdaptiveLayoutContext: removeView: view -- $view")
         }
     }
 
-    override fun updateViewLayout(view: View?, params: ViewGroup.LayoutParams?) {
+    fun updateViewLayout(view: View?, params: ViewGroup.LayoutParams?) {
         if (DEBUG) {
             println("AdaptiveLayoutContext: updateViewLayout: view -- $view ; params -- $params")
         }
@@ -209,10 +209,10 @@ class AdaptiveLayoutContext<out T>(
     private var myView: View? = null
 
 
-    override val view: View
+    val view: View
         get() = myView ?: throw IllegalStateException("View was not set previously")
 
-    override fun addView(view: View?, params: ViewGroup.LayoutParams?) {
+    fun addView(view: View?, params: ViewGroup.LayoutParams?) {
         if (view == null) return
 
         if (myView != null) {
