@@ -1,23 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context="com.young.sample.NormalActivity">
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="AutoSized List Title"
-        android:textSize="30px"/>
-
-    <ListView
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#999999"
-        android:id="@+id/listView"/>
+        android:orientation="vertical"
+        tools:context="com.young.sample.NormalActivity"
+        tools:ignore="PxUsage, HardcodedText">
 
+        <android.support.design.widget.AppBarLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:theme="@style/AppTheme.AppBarOverlay">
+
+                <android.support.v7.widget.Toolbar
+                        android:layout_width="match_parent"
+                        android:layout_height="90px"
+                        android:id="@+id/toolbar"
+                        android:background="?attr/colorPrimary"
+                        app:titleTextAppearance="@style/ToolBar_Title_Style"
+                        app:title="Design : 720px * 1280px"
+                        android:fitsSystemWindows="true"
+                        app:popupTheme="@style/AppTheme.PopupOverlay">
+
+                </android.support.v7.widget.Toolbar>
+
+        </android.support.design.widget.AppBarLayout>
+
+        <TextView
+                android:layout_width="360px"
+                android:layout_height="100px"
+                android:background="#038d3f"
+                android:gravity="center"
+                android:text="360px * 100px" />
+
+        <Button
+                android:layout_width="wrap_content"
+                android:layout_height="90px"
+                android:textSize="16px"
+                android:text="wrap * 90px : marginStart-100px : tSize:16px"
+                android:layout_marginLeft="100px"
+                android:layout_marginStart="100px" />
+
+        <Button
+                android:layout_width="match_parent"
+                android:layout_height="180px"
+                android:textSize="26px"
+                android:text="match * 180px : marginStart-200px : tSize:26px"
+                android:layout_marginLeft="200px"
+                android:layout_marginStart="200px" />
+
+
+        <TextView
+                android:layout_width="720px"
+                android:layout_height="80px"
+                android:background="#038fff"
+                android:gravity="center"
+                android:text="720px * 80px" />
+
+        <ImageView
+                android:layout_width="200px"
+                android:layout_height="200px"
+                android:background="#dddddd"
+                android:src="@mipmap/ic_launcher_round"
+                android:scaleType="fitXY" />
 
 </LinearLayout>

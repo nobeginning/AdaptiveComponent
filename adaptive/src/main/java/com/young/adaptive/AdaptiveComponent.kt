@@ -6,14 +6,14 @@ import android.content.ContextWrapper
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.support.annotation.StringDef
+import android.support.v7.widget.Toolbar
 import android.util.DisplayMetrics
 import android.util.Log
 import android.view.*
-import com.young.adaptive.component.IComponent
-import com.young.adaptive.component.PaddingComponent
-import com.young.adaptive.component.ParameterComponent
-import com.young.adaptive.component.TextSizeComponent
+import com.young.adaptive.component.*
+import com.young.adaptive.component.typed.ToolbarAdaptiveComponent
 import java.util.*
+import kotlin.collections.HashMap
 
 /**
  * Created by Young on 2017/9/27.
@@ -31,10 +31,14 @@ private const val META_NAME_DESIGN_WIDTH: String = "com.young.adaptive.designWid
 private const val META_NAME_DESIGN_HEIGHT: String = "com.young.adaptive.designHeight"
 private const val LOG_TAG: String = "AdaptiveComponent"
 
-class AdaptiveAssistant {
+object AdaptiveAssistant {
     fun setContentView(activity: Activity, layoutId: Int) {
         val layout = LayoutInflater.from(activity).inflate(layoutId, null)
         AdaptiveLayoutContext(activity, activity, true).addView(layout, null)
+    }
+
+    fun setContentView(activity: Activity, view: View) {
+        AdaptiveLayoutContext(activity, activity, true).addView(view, null)
     }
 
     fun adaptive(context: Context, parentView: ViewGroup?, layoutId: Int): View {
@@ -60,6 +64,8 @@ interface AdaptiveViewManager<out T> : ViewManager {
 const val COMPONENT_PRESET_PADDING = "COMPONENT_PRESET_PADDING"
 const val COMPONENT_PRESET_PARAMETER = "COMPONENT_PRESET_PARAMETER"
 const val COMPONENT_PRESET_TEXT_SIZE = "COMPONENT_PRESET_TEXT_SIZE"
+const val COMPONENT_PRESET_GRADIENT_DRAWABLE = "COMPONENT_PRESET_GRADIENT_DRAWABLE"
+const val COMPONENT_PRESET_TYPED_TOOLBAR = "COMPONENT_PRESET_TYPED_TOOLBAR"
 
 public object AdaptiveComponent {
 
@@ -68,28 +74,28 @@ public object AdaptiveComponent {
     private var metaData: Bundle? = null
     private var displayMetrics: DisplayMetrics? = null
 
-    private fun initDisplayMetrics(context: Context){
+    private fun initDisplayMetrics(context: Context) {
         displayMetrics = DisplayMetrics()
         val windowManager: WindowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
         windowManager.defaultDisplay.getMetrics(displayMetrics)
     }
 
-    fun getScreenWidth(context: Context):Int{
-        if (displayMetrics==null){
+    fun getScreenWidth(context: Context): Int {
+        if (displayMetrics == null) {
             initDisplayMetrics(context)
         }
         return displayMetrics!!.widthPixels
     }
 
-    fun getScreenHeight(context: Context):Int{
-        if (displayMetrics==null){
+    fun getScreenHeight(context: Context): Int {
+        if (displayMetrics == null) {
             initDisplayMetrics(context)
         }
         return displayMetrics!!.heightPixels
     }
 
-    fun getDesignWidth(ctx: Context):Int{
-        if (designWidth>-1){
+    fun getDesignWidth(ctx: Context): Int {
+        if (designWidth > -1) {
             return designWidth
         }
         if (metaData == null) {
@@ -103,8 +109,8 @@ public object AdaptiveComponent {
         }
     }
 
-    fun getDesignHeight(ctx: Context):Int{
-        if (designHeight>-1){
+    fun getDesignHeight(ctx: Context): Int {
+        if (designHeight > -1) {
             return designHeight
         }
         if (metaData == null) {
@@ -142,25 +148,34 @@ public object AdaptiveComponent {
         return result
     }
 
-    @StringDef(COMPONENT_PRESET_PADDING, COMPONENT_PRESET_PARAMETER, COMPONENT_PRESET_TEXT_SIZE)
+    @StringDef(
+            COMPONENT_PRESET_PADDING,
+            COMPONENT_PRESET_PARAMETER,
+            COMPONENT_PRESET_TEXT_SIZE,
+            COMPONENT_PRESET_GRADIENT_DRAWABLE,
+            COMPONENT_PRESET_TYPED_TOOLBAR)
     @Retention(AnnotationRetention.SOURCE)
     annotation class PresetComponent
 
+    private val typedComponents: HashMap<Class<*>, TypedComponent<*>> = HashMap()
     private val components: LinkedList<IComponent> = LinkedList()
     private val presetPaddingComponent: IComponent = PaddingComponent()
     private val presetParameterComponent: IComponent = ParameterComponent()
     private val presetTextSizeComponent: IComponent = TextSizeComponent()
+    private val presetGradientDrawableComponent: GradientDrawableComponent = GradientDrawableComponent()
+
+    private val toolbarAdaptiveComponent = ToolbarAdaptiveComponent()
 
     init {
         components.add(presetPaddingComponent)
         components.add(presetParameterComponent)
         components.add(presetTextSizeComponent)
+        components.add(presetGradientDrawableComponent)
+        putTypedComponent(Toolbar::class.java, toolbarAdaptiveComponent)
     }
 
     fun initWithoutPreset() {
-        remove(presetPaddingComponent)
-        remove(presetParameterComponent)
-        remove(presetTextSizeComponent)
+        clear()
     }
 
     fun removePresetComponent(@PresetComponent component: String) {
@@ -168,6 +183,8 @@ public object AdaptiveComponent {
             COMPONENT_PRESET_PADDING -> remove(presetPaddingComponent)
             COMPONENT_PRESET_PARAMETER -> remove(presetParameterComponent)
             COMPONENT_PRESET_TEXT_SIZE -> remove(presetTextSizeComponent)
+            COMPONENT_PRESET_GRADIENT_DRAWABLE -> remove(presetGradientDrawableComponent)
+            COMPONENT_PRESET_TYPED_TOOLBAR -> typedComponents.remove(Toolbar::class.java)
         }
     }
 
@@ -179,11 +196,24 @@ public object AdaptiveComponent {
         components.remove(component)
     }
 
-    fun clear() {
-        components.clear()
+    fun <T : View> putTypedComponent(clazz: Class<T>, component: TypedComponent<T>) {
+        typedComponents[clazz] = component
     }
 
-    fun getAllComponents(): List<IComponent> {
+    fun clear() {
+        components.clear()
+        typedComponents.clear()
+    }
+
+    fun <T : View> getTypedComponent(clazz: Class<T>): TypedComponent<*>? {
+        return typedComponents[clazz]
+    }
+
+    fun getAllTypedComponent(): Map<Class<*>, TypedComponent<*>> {
+        return typedComponents
+    }
+
+    fun getAllUntypedComponents(): List<IComponent> {
         return components
     }
 }
@@ -235,7 +265,6 @@ class AdaptiveLayoutContext<out T>(
     }
 
 
-
     fun doAdaptive(context: Context, view: View): View {
         return adaptiveView(context, view)
     }
@@ -244,10 +273,13 @@ class AdaptiveLayoutContext<out T>(
         val screenWidth = AdaptiveComponent.getScreenWidth(context)
         val screenHeight = AdaptiveComponent.getScreenHeight(context)
 
-        val components = AdaptiveComponent.getAllComponents()
+        val components = AdaptiveComponent.getAllUntypedComponents()
         components.forEach {
             it.adaptive(view, screenWidth, screenHeight, AdaptiveComponent.getDesignWidth(ctx), AdaptiveComponent.getDesignHeight(ctx))
         }
+
+        val typedComponent = AdaptiveComponent.getTypedComponent(view::class.java) as TypedComponent<View>?
+        typedComponent?.typedAdaptive(view, screenWidth, screenHeight, AdaptiveComponent.getDesignWidth(ctx), AdaptiveComponent.getDesignHeight(ctx))
 
         if (view is ViewGroup) {
             val childCount = view.childCount

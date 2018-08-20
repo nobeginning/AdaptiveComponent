@@ -1,34 +1,36 @@
 package com.young.sample
 
 import android.os.Bundle
-import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.view.Menu
 import android.view.MenuItem
-import com.young.adaptive.AdaptiveComponent
-import com.young.adaptive.COMPONENT_PRESET_PARAMETER
-import com.young.adaptive.COMPONENT_PRESET_TEXT_SIZE
-import com.young.adaptive.component.TextSizeComponent
+import com.young.adaptive.AdaptiveAssistant
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.content_main.*
 
 class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        val toolbar:Toolbar = findViewById(R.id.toolbar)
+        AdaptiveAssistant.setContentView(this, R.layout.activity_main)
+        val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
+        println(toolbar)
 
-        fab.setOnClickListener { view ->
-//            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                    .setAction("Action", null).show()
+        btn_action_normal.setOnClickListener {
             NormalActivity.launch(this)
         }
 
-        autoAnkoInvoke.setOnClickListener {
+        btn_action_anko.setOnClickListener {
             AnkoActivity.launch(this)
+        }
+
+        btn_action_list.setOnClickListener {
+            ListActivity.launch(this)
+        }
+
+        btn_action_to_sample.setOnClickListener {
+            SampleActivity.launch(this)
         }
     }
 

@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        tools:context=".SampleActivity"
+        tools:ignore="PxUsage,HardcodedText">
+
+        <android.support.design.widget.AppBarLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:theme="@style/AppTheme.AppBarOverlay">
+
+                <android.support.v7.widget.Toolbar
+                        android:id="@+id/toolbar"
+                        android:layout_width="match_parent"
+                        android:layout_height="90px"
+                        android:background="?attr/colorPrimary"
+                        app:popupTheme="@style/AppTheme.PopupOverlay"
+                        app:title="Sample Title"
+                        app:titleTextAppearance="@style/ToolBar_Title_Style" />
+
+        </android.support.design.widget.AppBarLayout>
+
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Title - 65px"
+                android:layout_marginTop="23px"
+                android:textSize="65px"
+                android:textStyle="bold"
+                android:layout_marginLeft="36px"
+                android:textColor="#202020"
+                android:layout_marginStart="36px" />
+
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="36px"
+                android:layout_marginRight="36px"
+                android:background="@drawable/shape_round_corner_15px_038afb"
+                android:padding="36px"
+                android:layout_marginTop="48px"
+                android:orientation="vertical">
+
+                <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#ffffff"
+                        android:textSize="38px"
+                        android:text="BG - 15px corner" />
+
+                <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#ffffff"
+                        android:textSize="29px"
+                        android:layout_marginTop="23px"
+                        android:text="textSize:29px; marginTop:23px" />
+
+
+                <Button
+                        android:layout_width="match_parent"
+                        android:layout_height="81px"
+                        android:textColor="#038AFB"
+                        android:textSize="33px"
+                        android:layout_marginTop="46px"
+                        android:background="#ffffff"
+                        android:text="textSize:33px; marginTop:46px" />
+
+        </LinearLayout>
+
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="36px"
+                android:layout_marginRight="36px"
+                android:background="@drawable/shape_round_corner_10_20px_00cb91"
+                android:padding="36px"
+                android:layout_marginTop="48px"
+                android:orientation="vertical">
+
+                <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#ffffff"
+                        android:textSize="38px"
+                        android:text="Top 10px &amp; Bottom 20px corner" />
+
+                <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#ffffff"
+                        android:textSize="29px"
+                        android:layout_marginTop="23px"
+                        android:text="Same as above" />
+
+
+                <Button
+                        android:layout_width="match_parent"
+                        android:layout_height="81px"
+                        android:textColor="#038AFB"
+                        android:textSize="33px"
+                        android:layout_marginTop="46px"
+                        android:background="#ffffff"
+                        android:text="Action Button" />
+
+        </LinearLayout>
+
+</LinearLayout>

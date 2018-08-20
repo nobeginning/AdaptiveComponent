@@ -15,3 +15,7 @@ interface IComponent {
      */
     fun adaptive(view: View, screenWidth: Int, screenHeight: Int, designWidth: Int, designHeight: Int)
 }
+
+interface TypedComponent<T : View> {
+    fun typedAdaptive(view: T, screenWidth: Int, screenHeight: Int, designWidth: Int, designHeight: Int)
+}
