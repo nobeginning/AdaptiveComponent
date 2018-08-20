@@ -39,8 +39,8 @@ repositories {
 ```
 dependencies {
     ...
-    compile 'com.github.nobeginning.AdaptiveAnkoComponent:adaptive-anko:0.2.3'
-    compile 'com.github.nobeginning.AdaptiveAnkoComponent:adaptive:0.2.3'
+    compile 'com.github.nobeginning.AdaptiveAnkoComponent:adaptive-anko:v0.3.0'
+    compile 'com.github.nobeginning.AdaptiveAnkoComponent:adaptive:v0.3.0'
 }
 ```
 
