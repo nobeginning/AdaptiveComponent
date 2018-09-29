@@ -13,6 +13,10 @@ class GradientDrawableComponent : IComponent {
                 if (bgDrawable.shape != GradientDrawable.RECTANGLE) {
                     return
                 }
+                if (bgDrawable.useLevel) {
+                    return
+                }
+                bgDrawable.useLevel = true
                 val corner = bgDrawable.cornerRadius
                 if (corner > 0) {
                     bgDrawable.cornerRadius = AdaptiveComponent.calculate(designWidth, screenWidth, corner)
