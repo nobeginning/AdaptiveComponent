@@ -51,7 +51,7 @@ object AdaptiveAssistant {
     }
 
     fun adaptiveHeight(context: Context, height: Int): Int {
-        return AdaptiveComponent.calculate(AdaptiveComponent.getDesignHeight(context), AdaptiveComponent.getScreenHeight(context), height)
+        return AdaptiveComponent.calculate(AdaptiveComponent.getDesignWidth(context), AdaptiveComponent.getScreenWidth(context), height)
     }
 }
 

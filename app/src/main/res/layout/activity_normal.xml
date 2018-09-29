@@ -65,4 +65,13 @@
                 android:src="@mipmap/ic_launcher_round"
                 android:scaleType="fitXY" />
 
+
+        <TextView
+                android:layout_width="200px"
+                android:layout_height="200px"
+                android:layout_gravity="center_horizontal"
+                android:background="@drawable/shape_circle"
+                android:gravity="center"
+                android:text="Circle" />
+
 </LinearLayout>

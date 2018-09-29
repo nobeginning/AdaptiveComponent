@@ -21,13 +21,19 @@ open class ParameterComponent : IComponent {
                                   screenWidth: Int, screenHeight: Int,
                                   view: View,
                                   designWidth: Int, designHeight: Int): ViewGroup.LayoutParams {
+        val originWidth = params.width
+        val originHeight = params.height
         if (params.width > 0) {
             params.width = AdaptiveComponent.calculate(designWidth, screenWidth, params.width)
         } else if (params.width == PX_1) {
             params.width = PX_UNIT
         }
         if (params.height > 0) {
-            params.height = AdaptiveComponent.calculate(designHeight, screenHeight, params.height)
+            if (originHeight == originWidth) {
+                params.height = params.width
+            } else {
+                params.height = AdaptiveComponent.calculate(designHeight, screenHeight, params.height)
+            }
         } else if (params.height == PX_1) {
             params.height = PX_UNIT
         }

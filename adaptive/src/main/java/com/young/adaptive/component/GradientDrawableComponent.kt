@@ -9,8 +9,10 @@ class GradientDrawableComponent : IComponent {
     override fun adaptive(view: View, screenWidth: Int, screenHeight: Int, designWidth: Int, designHeight: Int) {
         val bgDrawable = view.background
         if (bgDrawable is GradientDrawable) {
-            println(bgDrawable)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                if (bgDrawable.shape != GradientDrawable.RECTANGLE) {
+                    return
+                }
                 val corner = bgDrawable.cornerRadius
                 if (corner > 0) {
                     bgDrawable.cornerRadius = AdaptiveComponent.calculate(designWidth, screenWidth, corner)
