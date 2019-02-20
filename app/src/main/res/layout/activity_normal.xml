@@ -51,6 +51,20 @@
                 android:layout_marginLeft="200px"
                 android:layout_marginStart="200px" />
 
+        <View
+                android:layout_width="match_parent"
+                android:layout_height="1px"
+                android:layout_marginTop="10px"
+                android:layout_marginBottom="10px"
+                android:background="#000000"/>
+
+        <View
+                android:layout_width="1px"
+                android:layout_height="30px"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="10px"
+                android:layout_marginBottom="10px"
+                android:background="#000000"/>
 
         <TextView
                 android:layout_width="720px"

@@ -14,10 +14,8 @@ Android自适应布局解决方案
 
 * 使用Kotlin开发（顺便推广一下，用了Kotlin之后，基本上不会再喜欢写java的代码了）
 * 超低侵入性（不需要继承Activity，不需要改变之前的layout文件，只需要依赖+配置meta）
-* 拔插式组件（哪里不爽拔哪里，哪里不爽插哪里）
+* 插拔式组件
 * 并同时支持普通的layout模式和Anko模式
-
-欢迎各种送花和拍砖，砖头越多越好，想盖房子，就差板砖了~~
 
 另外，如果本文读起来有任何不顺畅或者不合理的地方，也请帮忙提出来，感谢！
 
@@ -25,7 +23,7 @@ Android自适应布局解决方案
 
 ### Step1
 
-```groovy
+```
 repositories {
         ...
         maven { url 'https://jitpack.io' }
@@ -39,8 +37,8 @@ repositories {
 ```
 dependencies {
     ...
-    compile 'com.github.nobeginning.AdaptiveAnkoComponent:adaptive-anko:v0.3.0'
-    compile 'com.github.nobeginning.AdaptiveAnkoComponent:adaptive:v0.3.0'
+    compile 'com.github.nobeginning.AdaptiveAnkoComponent:adaptive-anko:v0.4.0'
+    compile 'com.github.nobeginning.AdaptiveAnkoComponent:adaptive:v0.4.0'
 }
 ```
 
@@ -61,10 +59,8 @@ In AndroidManifest.xml
         <meta-data
             android:name="com.young.adaptive.designWidth"
             android:value="720" />
-        <meta-data
-            android:name="com.young.adaptive.designHeight"
-            android:value="1280" />
-		<activity ... ></activity>
+            
+		<activity></activity>
 </application>
 ```
 
@@ -188,21 +184,21 @@ OK，那我们的重点就在第三步。接着往下梳理。
 
 ```kotlin
 private fun adaptiveView(context: Context, view: View): View {
-        val screenWidth = AdaptiveComponent.getScreenWidth(context)
-        val screenHeight = AdaptiveComponent.getScreenHeight(context)
+        val zoomRate = AdaptiveComponent.getZoomRate(context)
 
-        val components = AdaptiveComponent.getAllComponents()
-  
-  		//重点1--遍历组件list，并调用组件的自适应方法处理view
+        val components = AdaptiveComponent.getAllUntypedComponents()
         components.forEach {
-            it.adaptive(view, screenWidth, screenHeight, AdaptiveComponent.getDesignWidth(ctx), AdaptiveComponent.getDesignHeight(ctx))
+            it.adaptive(view, zoomRate)
         }
+
+        val typedComponent = AdaptiveComponent.getTypedComponent(view::class.java) as TypedComponent<View>?
+        typedComponent?.typedAdaptive(view, zoomRate)
 
         if (view is ViewGroup) {
             val childCount = view.childCount
             (0 until childCount)
                     .map { view.getChildAt(it) }
-                    .forEach { adaptiveView(context, it) }	//重点2--如果是ViewGroup，做递归调用
+                    .forEach { adaptiveView(context, it) }
         }
         return view
     }
@@ -210,20 +206,24 @@ private fun adaptiveView(context: Context, view: View): View {
 
 从代码中可以看到，具体的自适应操作是在``AdaptiveLayoutContext``这个类完成的，那如何自适应，哪些属性需要自适应，则是在``AdaptiveComponent``里边来管理的，具体的就是``IComponent``的List，这个list中的每个组件都会在处理每一个View的时候被执行一遍。
 
-例如，我预置了3种：``PaddingComponent``（用于处理View的Padding属性）、``ParameterComponent``（用于处理View的layoutParameter，可能更多的是margin）、``TextSizeComponent``（用于处理TextView的textSize），使用者如果没有其他额外需求的话，使用预置的这几个就可以了，但是当预置的这几个无法满足使用者的需求时，使用者只需要自己实现``IComponent``针对自己需要的View属性进行自适应，然后调用``AdaptiveComponent.add(component: IComponent) ``方法把自己的组件进行插入即可。
+例如，我预置了几种：
+``PaddingComponent``（用于处理View的Padding属性）；
+``ParameterComponent``（用于处理View的layoutParameter，可能更多的是margin）；
+``TextSizeComponent``（用于处理TextView的textSize）；
+``GradientDrawableComponent``（用于处理圆角Drawable）；
+``ToolbarAdaptiveComponent``（用于处理Toolbar title textSize）
+
+当预置的这几个无法满足使用者的需求时，使用者只需要自己实现``IComponent``针对自己需要的View属性进行自适应，然后调用``AdaptiveComponent.add(component: IComponent) ``方法把自己的组件进行插入即可。
 
 ``IComponent``抽象如下：
 
 ```kotlin
 interface IComponent {
     /**
-     * @param view  		正在进行自适应处理的View
-     * @param screenWidth   屏幕宽度
-     * @param screenHeight  屏幕高度
-     * @param designWidth   设计稿宽度
-     * @param designHeight  设计稿高度
+     * @param view  正在进行自适应处理的View
+     * @param zoomRate 缩放率 screenWidth / designWidth
      */
-    fun adaptive(view: View, screenWidth: Int, screenHeight: Int, designWidth: Int, designHeight: Int)
+    fun adaptive(view: View, zoomRate:BigDecimal)
 }
 ```
 
@@ -231,31 +231,31 @@ interface IComponent {
 
 ```kotlin
 class PaddingComponent : IComponent {
-    override fun adaptive(view: View, screenWidth: Int, screenHeight: Int, designWidth: Int, designHeight: Int) {
+    override fun adaptive(view: View, zoomRate:BigDecimal) {
         var paddingLeft = 0
         if (view.paddingLeft > 0) {
-            paddingLeft = AdaptiveComponent.calculate(designWidth, screenWidth, view.paddingLeft)
+            paddingLeft = AdaptiveComponent.calculate(zoomRate, view.paddingLeft)
         } else if (view.paddingLeft == PX_1) {
             paddingLeft = PX_UNIT
         }
 
         var paddingTop = 0
         if (view.paddingTop > 0) {
-            paddingTop = AdaptiveComponent.calculate(designHeight, screenHeight, view.paddingTop)
+            paddingTop = AdaptiveComponent.calculate(zoomRate, view.paddingTop)
         } else if (view.paddingTop == PX_1) {
             paddingTop = PX_UNIT
         }
 
         var paddingRight = 0
         if (view.paddingRight > 0) {
-            paddingRight = AdaptiveComponent.calculate(designWidth, screenWidth, view.paddingRight)
+            paddingRight = AdaptiveComponent.calculate(zoomRate, view.paddingRight)
         } else if (view.paddingRight == PX_1) {
             paddingRight = PX_UNIT
         }
 
         var paddingBottom = 0
         if (view.paddingBottom > 0) {
-            paddingBottom = AdaptiveComponent.calculate(designHeight, screenHeight, view.paddingBottom)
+            paddingBottom = AdaptiveComponent.calculate(zoomRate, view.paddingBottom)
         } else if (view.paddingBottom == PX_1) {
             paddingBottom = PX_UNIT
         }
@@ -269,46 +269,45 @@ class PaddingComponent : IComponent {
 
 ```kotlin
 open class ParameterComponent : IComponent {
-    override fun adaptive(view: View, screenWidth: Int, screenHeight: Int, designWidth: Int, designHeight: Int) {
+    override fun adaptive(view: View, zoomRate: BigDecimal) {
         val params: ViewGroup.LayoutParams? = view.layoutParams
         params?.apply {
-            view.layoutParams = autoLayoutParameters(params, screenWidth, screenHeight, view, designWidth, designHeight)
+            view.layoutParams = autoLayoutParameters(params, zoomRate, view)
         }
     }
 
     open fun autoLayoutParameters(params: ViewGroup.LayoutParams,
-                                  screenWidth: Int, screenHeight: Int,
-                                  view: View,
-                                  designWidth: Int, designHeight: Int): ViewGroup.LayoutParams {
+                                  zoomRate: BigDecimal,
+                                  view: View): ViewGroup.LayoutParams {
         if (params.width > 0) {
-            params.width = AdaptiveComponent.calculate(designWidth, screenWidth, params.width)
+            params.width = AdaptiveComponent.calculate(zoomRate, params.width)
         } else if (params.width == PX_1) {
             params.width = PX_UNIT
         }
         if (params.height > 0) {
-            params.height = AdaptiveComponent.calculate(designHeight, screenHeight, params.height)
+            params.height = AdaptiveComponent.calculate(zoomRate, params.height)
         } else if (params.height == PX_1) {
             params.height = PX_UNIT
         }
 
         if (params is ViewGroup.MarginLayoutParams) {
             if (params.leftMargin > 0) {
-                params.leftMargin = AdaptiveComponent.calculate(designWidth, screenWidth, params.leftMargin)
+                params.leftMargin = AdaptiveComponent.calculate(zoomRate, params.leftMargin)
             } else if (params.leftMargin == PX_1) {
                 params.leftMargin = PX_UNIT
             }
             if (params.rightMargin > 0) {
-                params.rightMargin = AdaptiveComponent.calculate(designWidth, screenWidth, params.rightMargin)
+                params.rightMargin = AdaptiveComponent.calculate(zoomRate, params.rightMargin)
             } else if (params.rightMargin == PX_1) {
                 params.rightMargin = PX_UNIT
             }
             if (params.topMargin > 0) {
-                params.topMargin = AdaptiveComponent.calculate(designHeight, screenHeight, params.topMargin)
+                params.topMargin = AdaptiveComponent.calculate(zoomRate, params.topMargin)
             } else if (params.topMargin == PX_1) {
                 params.topMargin = PX_UNIT
             }
             if (params.bottomMargin > 0) {
-                params.bottomMargin = AdaptiveComponent.calculate(designHeight, screenHeight, params.bottomMargin)
+                params.bottomMargin = AdaptiveComponent.calculate(zoomRate, params.bottomMargin)
             } else if (params.bottomMargin == PX_1) {
                 params.bottomMargin = PX_UNIT
             }
@@ -318,19 +317,61 @@ open class ParameterComponent : IComponent {
 }
 ```
 
-
-
 ``TextSizeComponent``处理逻辑：
 
 ```kotlin
 class TextSizeComponent : IComponent {
-    override fun adaptive(view: View, screenWidth: Int, screenHeight: Int, designWidth: Int, designHeight: Int) {
+    override fun adaptive(view: View, zoomRate:BigDecimal) {
         if (view is TextView) {
             val textSize = view.textSize
-            view.setTextSize(TypedValue.COMPLEX_UNIT_PX, AdaptiveComponent.calculate(designHeight, screenHeight, textSize))
+            var adaptiveSize = AdaptiveComponent.calculate(zoomRate, textSize)
+            adaptiveSize *= AdaptiveComponent.scaledDensity
+            view.setTextSize(TypedValue.COMPLEX_UNIT_PX, adaptiveSize)
         }
     }
 }
+```
+
+v0.4.0版本增加了View维度的组件扩展
+```kotlin
+interface TypedComponent<T : View> {
+    fun typedAdaptive(view: T, zoomRate:BigDecimal)
+}
+```
+
+参考示例：Toolbar
+```kotlin
+class ToolbarAdaptiveComponent : TypedComponent<Toolbar> {
+    override fun typedAdaptive(view: Toolbar, zoomRate: BigDecimal) {
+        if (view.title == null) {
+            view.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+                override fun onGlobalLayout() {
+                    try {
+                        val field = Toolbar::class.java.getDeclaredField("mTitleTextView")
+                        field.isAccessible = true
+                        val titleView: TextView = field.get(view) as TextView
+                        val textSize = titleView.textSize
+                        titleView.setTextSize(TypedValue.COMPLEX_UNIT_PX, AdaptiveComponent.calculate(zoomRate, textSize))
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                            view.viewTreeObserver.removeOnGlobalLayoutListener(this)
+                        } else {
+                            view.viewTreeObserver.removeGlobalOnLayoutListener(this)
+                        }
+                    } catch (e: Exception) {
+                        println(e.message ?: e.toString())
+                    }
+                }
+            })
+        }
+    }
+}
+```
+
+自定义TypedComponent设置方法使用AdaptiveComponent中的如下方法
+```kotlin
+fun <T : View, Sub : T> putTypedComponent(clazz: Class<Sub>, component: TypedComponent<T>) {
+        typedComponents[clazz] = component
+    }
 ```
 
 当然，如果使用者觉得，作者预置的这些组件完全不能满足我的要求，为此提供了预置组件删除功能
@@ -343,70 +384,13 @@ fun removePresetComponent(@PresetComponent component: String) {
             COMPONENT_PRESET_PADDING -> remove(presetPaddingComponent)
             COMPONENT_PRESET_PARAMETER -> remove(presetParameterComponent)
             COMPONENT_PRESET_TEXT_SIZE -> remove(presetTextSizeComponent)
+            COMPONENT_PRESET_GRADIENT_DRAWABLE -> remove(presetGradientDrawableComponent)
+            COMPONENT_PRESET_TYPED_TOOLBAR -> typedComponents.remove(Toolbar::class.java)
         }
     }
 ```
 
-
-
-其实最上方的**图解**已经基本说明了工作原理，``AdaptiveComponent``类还有一些其他可以直接用的小功能，如：
-
-***获取屏幕宽度***
-
-```kotlin
-fun getScreenWidth(context: Context):Int{
-        if (displayMetrics==null){
-            initDisplayMetrics(context)
-        }
-        return displayMetrics!!.widthPixels
-    }
-```
-
-***获取屏幕高度***
-
-```kotlin
-fun getScreenHeight(context: Context):Int{
-        if (displayMetrics==null){
-            initDisplayMetrics(context)
-        }
-        return displayMetrics!!.heightPixels
-    }
-```
-
-***计算自适应值***
-
-```kotlin
-fun calculate(designValue: Int, screeValue: Int, originValue: Int): Int {
-        if (designValue <= 0) {
-            Log.w(LOG_TAG, "Found design value **$designValue** is invalid. Have u forgot it?")
-            return originValue
-        }
-        var result = (originValue.toDouble() * screeValue.toDouble() / designValue.toDouble()).toInt()
-        if (result <= 0) {
-            result = 1
-        }
-        return result
-    }
-
-    fun calculate(designValue: Int, screeValue: Int, originValue: Float): Float {
-        if (designValue <= 0) {
-            Log.w(LOG_TAG, "Found design value **$designValue** is invalid. Have u forgot it?")
-            return originValue
-        }
-        var result = (originValue.toDouble() * screeValue.toDouble() / designValue.toDouble()).toFloat()
-        if (result < 1f) {
-            result = 1f
-        }
-        return result
-    }
-
-```
-
-
-
-大致先介绍这么些吧。目前这套方案在公司项目的一些简单页面中实验。
-
-Anko部分的支持还在优化，后续放出吧。基本原理都是一样的。
+大致先介绍这么些吧。
 
 对于新出的View，理论上这套方案是默认支持的，但是如果有新的属性，那就需要扩展组件去对这些新属性进行自适应处理了。
 
@@ -415,7 +399,6 @@ Anko部分的支持还在优化，后续放出吧。基本原理都是一样的�
 * 在layout中使用任何单位px/dp/sp，都会执行自适应。
 * 因为是插拔式组件，而且``IComponent``接口又非常的开放，权限放的很开，所以在这个接口的实现里可以对View做任何事。
 * 这一点原因同上，如果存在多个组件对View的同一个属性都做了自适应，那会导致这多个组件都生效，从而结果超出预期。比如：View1的padding为10，组件A对View1的padding做了自适应，结果变成了20，之后组件B也对View1的padding进行了自适应处理，结果从20变成了40。所以在使用过程中还需要注意。
-* 对于Anko的支持问题，因为定义了Anko上下文，所以用了这套方案之后，IDEA的Anko预览插件就会失效
 
 The End.
 
