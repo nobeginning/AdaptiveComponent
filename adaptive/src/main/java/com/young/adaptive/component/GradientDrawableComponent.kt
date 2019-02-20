@@ -4,9 +4,10 @@ import android.graphics.drawable.GradientDrawable
 import android.os.Build
 import android.view.View
 import com.young.adaptive.AdaptiveComponent
+import java.math.BigDecimal
 
 class GradientDrawableComponent : IComponent {
-    override fun adaptive(view: View, screenWidth: Int, screenHeight: Int, designWidth: Int, designHeight: Int) {
+    override fun adaptive(view: View, zoomRate:BigDecimal) {
         val bgDrawable = view.background
         if (bgDrawable is GradientDrawable) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -19,13 +20,13 @@ class GradientDrawableComponent : IComponent {
                 bgDrawable.useLevel = true
                 val corner = bgDrawable.cornerRadius
                 if (corner > 0) {
-                    bgDrawable.cornerRadius = AdaptiveComponent.calculate(designWidth, screenWidth, corner)
+                    bgDrawable.cornerRadius = AdaptiveComponent.calculate(zoomRate, corner)
                 } else {
                     val cornerArray = bgDrawable.cornerRadii ?: return
                     (0 until cornerArray.size).forEach {
                         val c = cornerArray[it]
                         if (c > 0) {
-                            cornerArray[it] = AdaptiveComponent.calculate(designWidth, screenWidth, c)
+                            cornerArray[it] = AdaptiveComponent.calculate(zoomRate, c)
                         }
                     }
                     bgDrawable.cornerRadii = cornerArray
@@ -46,7 +47,7 @@ class GradientDrawableComponent : IComponent {
                     radiusField.isAccessible = true
                     val corner = radiusField.get(state) as Float
                     if (corner > 0) {
-                        radiusField.set(state, AdaptiveComponent.calculate(designWidth, screenWidth, corner))
+                        radiusField.set(state, AdaptiveComponent.calculate(zoomRate, corner))
                     } else {
                         val arrField = state::class.java.getDeclaredField("mRadiusArray")
                         val cornerArray = arrField.get(state) as FloatArray?
@@ -54,7 +55,7 @@ class GradientDrawableComponent : IComponent {
                         (0 until cornerArray.size).forEach {
                             val c = cornerArray[it]
                             if (c > 0) {
-                                cornerArray[it] = AdaptiveComponent.calculate(designWidth, screenWidth, c)
+                                cornerArray[it] = AdaptiveComponent.calculate(zoomRate, c)
                             }
                         }
                         arrField.set(state, cornerArray)

@@ -6,14 +6,15 @@ import android.support.v7.widget.Toolbar
 import android.view.Menu
 import android.view.MenuItem
 import com.young.adaptive.AdaptiveAssistant
+import com.young.adaptive.AdaptiveComponent
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+//        AdaptiveComponent.register(application)
         AdaptiveAssistant.setContentView(this, R.layout.activity_main)
-        val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
         println(toolbar)
 

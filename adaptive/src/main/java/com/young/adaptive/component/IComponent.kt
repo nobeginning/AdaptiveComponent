@@ -1,6 +1,7 @@
 package com.young.adaptive.component
 
 import android.view.View
+import java.math.BigDecimal
 
 /**
  * Created by young on 2017/12/19.
@@ -8,14 +9,11 @@ import android.view.View
 interface IComponent {
     /**
      * @param view  正在进行自适应处理的View
-     * @param screenWidth   屏幕宽度
-     * @param screenHeight  屏幕高度
-     * @param designWidth   设计稿宽度
-     * @param designHeight  设计稿高度
+     * @param zoomRate 缩放率 screenWidth / designWidth
      */
-    fun adaptive(view: View, screenWidth: Int, screenHeight: Int, designWidth: Int, designHeight: Int)
+    fun adaptive(view: View, zoomRate:BigDecimal)
 }
 
 interface TypedComponent<T : View> {
-    fun typedAdaptive(view: T, screenWidth: Int, screenHeight: Int, designWidth: Int, designHeight: Int)
+    fun typedAdaptive(view: T, zoomRate:BigDecimal)
 }

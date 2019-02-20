@@ -36,9 +36,10 @@
 
         <Button
                 android:layout_width="wrap_content"
-                android:layout_height="90px"
+                android:layout_height="wrap_content"
                 android:textSize="16px"
-                android:text="wrap * 90px : marginStart-100px : tSize:16px"
+                android:id="@+id/button"
+                android:text="wrap * wrap : marginStart-100px : tSize:16px\nClick me to change the textSize to 26px"
                 android:layout_marginLeft="100px"
                 android:layout_marginStart="100px" />
 
@@ -57,11 +58,18 @@
                 android:background="#038fff"
                 android:gravity="center"
                 android:text="720px * 80px" />
+        <TextView
+                android:layout_width="360px"
+                android:layout_height="180px"
+                android:background="#038f00"
+                android:gravity="center"
+                android:text="360px * 180px" />
 
         <ImageView
-                android:layout_width="200px"
-                android:layout_height="200px"
+                android:layout_width="60px"
+                android:layout_height="60px"
                 android:background="#dddddd"
+                android:layout_gravity="center_horizontal"
                 android:src="@mipmap/ic_launcher_round"
                 android:scaleType="fitXY" />
 

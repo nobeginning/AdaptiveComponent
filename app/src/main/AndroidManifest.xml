@@ -12,9 +12,6 @@
                 <meta-data
                         android:name="com.young.adaptive.designWidth"
                         android:value="720" />
-                <meta-data
-                        android:name="com.young.adaptive.designHeight"
-                        android:value="1280" />
 
                 <activity
                         android:name=".MainActivity"

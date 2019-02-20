@@ -12,6 +12,9 @@
                 android:layout_height="80px"
                 android:text="AutoSized List Title - height : 80px "
                 android:background="@color/colorPrimary"
+                android:gravity="center"
+                android:textColor="#ffffff"
+                android:textStyle="bold"
                 android:textSize="30px" />
 
         <ListView

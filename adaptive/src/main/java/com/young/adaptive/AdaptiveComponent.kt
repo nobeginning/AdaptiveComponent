@@ -1,9 +1,12 @@
 package com.young.adaptive
 
 import android.app.Activity
+import android.app.Application
+import android.content.ComponentCallbacks
 import android.content.Context
 import android.content.ContextWrapper
 import android.content.pm.PackageManager
+import android.content.res.Configuration
 import android.os.Bundle
 import android.support.annotation.StringDef
 import android.support.v7.widget.Toolbar
@@ -12,6 +15,7 @@ import android.util.Log
 import android.view.*
 import com.young.adaptive.component.*
 import com.young.adaptive.component.typed.ToolbarAdaptiveComponent
+import java.math.BigDecimal
 import java.util.*
 import kotlin.collections.HashMap
 
@@ -46,12 +50,17 @@ object AdaptiveAssistant {
         return AdaptiveLayoutContext(context, context, false).doAdaptive(context, layout)
     }
 
-    fun adaptiveWidth(context: Context, width: Int): Int {
-        return AdaptiveComponent.calculate(AdaptiveComponent.getDesignWidth(context), AdaptiveComponent.getScreenWidth(context), width)
+    fun calculateAdaptive(context: Context, value: Int): Int {
+        return AdaptiveComponent.calculate(AdaptiveComponent.getZoomRate(context), value)
     }
 
-    fun adaptiveHeight(context: Context, height: Int): Int {
-        return AdaptiveComponent.calculate(AdaptiveComponent.getDesignHeight(context), AdaptiveComponent.getScreenHeight(context), height)
+    fun calculateAdaptive(context: Context, value: Float): Float {
+        return AdaptiveComponent.calculate(AdaptiveComponent.getZoomRate(context), value)
+    }
+
+    fun calculateAdaptiveTextSize(context: Context, value: Float): Float {
+        val adaptiveValue = AdaptiveComponent.calculate(AdaptiveComponent.getZoomRate(context), value)
+        return adaptiveValue * AdaptiveComponent.scaledDensity
     }
 }
 
@@ -70,28 +79,46 @@ const val COMPONENT_PRESET_TYPED_TOOLBAR = "COMPONENT_PRESET_TYPED_TOOLBAR"
 public object AdaptiveComponent {
 
     private var designWidth: Int = -1
-    private var designHeight: Int = -1
+    var scaledDensity: Float = 1f
     private var metaData: Bundle? = null
     private var displayMetrics: DisplayMetrics? = null
+    private var application: Application? = null
 
-    private fun initDisplayMetrics(context: Context) {
-        displayMetrics = DisplayMetrics()
-        val windowManager: WindowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
-        windowManager.defaultDisplay.getMetrics(displayMetrics)
+    private val callback = object : ComponentCallbacks {
+        override fun onLowMemory() {}
+
+        override fun onConfigurationChanged(newConfig: Configuration?) {
+            newConfig ?: return
+            if (newConfig.fontScale > 0) {
+                application?.apply {
+                    displayMetrics = resources.displayMetrics
+                    val metrics = displayMetrics ?: return@apply
+                    scaledDensity = metrics.scaledDensity / metrics.density
+                }
+            }
+        }
+    }
+
+    fun register(application: Application) {
+        this.application = application
+        displayMetrics = application.resources.displayMetrics
+        application.unregisterComponentCallbacks(callback)
+        application.registerComponentCallbacks(callback)
+        val metrics = displayMetrics ?: return
+        scaledDensity = metrics.scaledDensity / metrics.density
+    }
+
+    fun getZoomRate(context: Context): BigDecimal {
+        val screenWidth = getScreenWidth(context)
+        val designWidth = getDesignWidth(context)
+        return BigDecimal(screenWidth).divide(BigDecimal(designWidth))
     }
 
     fun getScreenWidth(context: Context): Int {
         if (displayMetrics == null) {
-            initDisplayMetrics(context)
+            displayMetrics = context.resources.displayMetrics
         }
         return displayMetrics!!.widthPixels
-    }
-
-    fun getScreenHeight(context: Context): Int {
-        if (displayMetrics == null) {
-            initDisplayMetrics(context)
-        }
-        return displayMetrics!!.heightPixels
     }
 
     fun getDesignWidth(ctx: Context): Int {
@@ -109,19 +136,20 @@ public object AdaptiveComponent {
         }
     }
 
-    fun getDesignHeight(ctx: Context): Int {
-        if (designHeight > -1) {
-            return designHeight
+    fun calculate(zoomRate: BigDecimal, originValue: Int): Int {
+        var result = BigDecimal(originValue).multiply(zoomRate).toInt()
+        if (result <= 0) {
+            result = 1
         }
-        if (metaData == null) {
-            metaData = ctx.packageManager.getApplicationInfo(ctx.packageName, PackageManager.GET_META_DATA)?.metaData
+        return result
+    }
+
+    fun calculate(zoomRate: BigDecimal, originValue: Float): Float {
+        var result = BigDecimal(originValue.toDouble()).multiply(zoomRate).toFloat()
+        if (result <= 0) {
+            result = 1f
         }
-        return if (metaData != null && metaData!!.containsKey(META_NAME_DESIGN_HEIGHT)) {
-            designHeight = metaData!!.get(META_NAME_DESIGN_HEIGHT) as Int
-            designHeight
-        } else {
-            0
-        }
+        return result
     }
 
     fun calculate(designValue: Int, screeValue: Int, originValue: Int): Int {
@@ -196,7 +224,7 @@ public object AdaptiveComponent {
         components.remove(component)
     }
 
-    fun <T : View> putTypedComponent(clazz: Class<T>, component: TypedComponent<T>) {
+    fun <T : View, Sub : T> putTypedComponent(clazz: Class<Sub>, component: TypedComponent<T>) {
         typedComponents[clazz] = component
     }
 
@@ -270,16 +298,15 @@ class AdaptiveLayoutContext<out T>(
     }
 
     private fun adaptiveView(context: Context, view: View): View {
-        val screenWidth = AdaptiveComponent.getScreenWidth(context)
-        val screenHeight = AdaptiveComponent.getScreenHeight(context)
+        val zoomRate = AdaptiveComponent.getZoomRate(context)
 
         val components = AdaptiveComponent.getAllUntypedComponents()
         components.forEach {
-            it.adaptive(view, screenWidth, screenHeight, AdaptiveComponent.getDesignWidth(ctx), AdaptiveComponent.getDesignHeight(ctx))
+            it.adaptive(view, zoomRate)
         }
 
         val typedComponent = AdaptiveComponent.getTypedComponent(view::class.java) as TypedComponent<View>?
-        typedComponent?.typedAdaptive(view, screenWidth, screenHeight, AdaptiveComponent.getDesignWidth(ctx), AdaptiveComponent.getDesignHeight(ctx))
+        typedComponent?.typedAdaptive(view, zoomRate)
 
         if (view is ViewGroup) {
             val childCount = view.childCount
