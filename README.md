@@ -15,7 +15,7 @@ Android自适应布局解决方案
 * 使用Kotlin开发（顺便推广一下，用了Kotlin之后，基本上不会再喜欢写java的代码了）
 * 超低侵入性（不需要继承Activity，不需要改变之前的layout文件，只需要依赖+配置meta）
 * 插拔式组件
-* 并同时支持普通的layout模式和Anko模式
+* ~~并同时支持普通的layout模式和Anko模式~~【v0.5.0起取消对Anko的支持】
 
 另外，如果本文读起来有任何不顺畅或者不合理的地方，也请帮忙提出来，感谢！
 
@@ -34,11 +34,22 @@ repositories {
 
 ### Step2
 
+> &lt;v0.5.0
+
 ```
 dependencies {
     ...
     compile 'com.github.nobeginning.AdaptiveAnkoComponent:adaptive-anko:v0.4.0'
     compile 'com.github.nobeginning.AdaptiveAnkoComponent:adaptive:v0.4.0'
+}
+```
+
+> &gt;=v0.5.0
+
+```
+dependencies {
+    ...
+    compile 'com.github.nobeginning:AdaptiveComponent:v0.5.0'
 }
 ```
 
@@ -136,12 +147,6 @@ override fun getView(position: Int, convertView: View?, parent: ViewGroup?): Vie
 ##### AdaptiveLayoutContext
 
 > 核心类，用于处理自适应逻辑
-
-
-
-##### AdaptiveViewManager
-
-> 用于Anko的支持，待优化
 
 
 
