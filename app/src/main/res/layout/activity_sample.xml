@@ -8,12 +8,12 @@
         tools:context=".SampleActivity"
         tools:ignore="PxUsage,HardcodedText">
 
-        <android.support.design.widget.AppBarLayout
+        <com.google.android.material.appbar.AppBarLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:theme="@style/AppTheme.AppBarOverlay">
 
-                <android.support.v7.widget.Toolbar
+                <androidx.appcompat.widget.Toolbar
                         android:id="@+id/toolbar"
                         android:layout_width="match_parent"
                         android:layout_height="90px"
@@ -22,7 +22,7 @@
                         app:title="Sample Title"
                         app:titleTextAppearance="@style/ToolBar_Title_Style" />
 
-        </android.support.design.widget.AppBarLayout>
+        </com.google.android.material.appbar.AppBarLayout>
 
         <TextView
                 android:layout_width="wrap_content"

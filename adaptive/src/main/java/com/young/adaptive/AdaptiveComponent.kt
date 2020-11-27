@@ -8,11 +8,11 @@ import android.content.ContextWrapper
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.os.Bundle
-import android.support.annotation.StringDef
-import android.support.v7.widget.Toolbar
 import android.util.DisplayMetrics
 import android.util.Log
 import android.view.*
+import androidx.annotation.StringDef
+import androidx.appcompat.widget.Toolbar
 import com.young.adaptive.component.*
 import com.young.adaptive.component.typed.ToolbarAdaptiveComponent
 import java.math.BigDecimal

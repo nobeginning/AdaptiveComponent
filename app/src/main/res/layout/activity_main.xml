@@ -1,83 +1,75 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity"
+    tools:ignore="HardcodedText,PxUsage">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/app_bar"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context=".MainActivity"
-        tools:ignore="HardcodedText,PxUsage">
+        android:layout_height="wrap_content"
+        android:theme="@style/AppTheme.AppBarOverlay"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
-        <android.support.design.widget.AppBarLayout
-                android:id="@+id/app_bar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:theme="@style/AppTheme.AppBarOverlay">
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="90px"
+            android:background="?attr/colorPrimary"
+            app:popupTheme="@style/AppTheme.PopupOverlay"
+            app:title="Main Page"
+            app:titleTextAppearance="@style/ToolBar_Title_Style" />
 
-                <android.support.v7.widget.Toolbar
-                        android:id="@+id/toolbar"
-                        android:layout_width="match_parent"
-                        android:layout_height="90px"
-                        app:title="Main Page"
-                        android:background="?attr/colorPrimary"
-                        app:titleTextAppearance="@style/ToolBar_Title_Style"
-                        app:popupTheme="@style/AppTheme.PopupOverlay" />
+    </com.google.android.material.appbar.AppBarLayout>
 
-        </android.support.design.widget.AppBarLayout>
+    <TextView
+        android:id="@+id/tv_desc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20px"
+        android:lineSpacingMultiplier="1.2"
+        android:text="Design Width : 720px \nDesign Height : 1280px"
+        android:textSize="32px"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/app_bar" />
 
-        <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/tv_desc"
-                android:textSize="32px"
-                android:textStyle="bold"
-                android:layout_marginTop="20px"
-                android:lineSpacingMultiplier="1.2"
-                android:text="Design Width : 720px \nDesign Height : 1280px"
-                app:layout_constraintTop_toBottomOf="@id/app_bar"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent" />
+    <Button
+        android:id="@+id/btn_action_normal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="20px"
+        android:text="普通XML页面/Normal XML Layout Activity"
+        android:textSize="26px"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_desc" />
 
-        <Button
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="20px"
-                android:id="@+id/btn_action_normal"
-                android:textSize="26px"
-                android:text="普通XML页面/Normal XML Layout Activity"
-                app:layout_constraintTop_toBottomOf="@id/tv_desc"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent" />
+    <Button
+        android:id="@+id/btn_action_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="20px"
+        android:text="List Layout页面/List Layout Activity"
+        android:textSize="26px"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/btn_action_normal" />
 
-        <Button
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="20px"
-                android:id="@+id/btn_action_anko"
-                android:textSize="26px"
-                android:text="Anko Layout页面/Anko Layout Activity"
-                app:layout_constraintTop_toBottomOf="@id/btn_action_normal"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent" />
-
-        <Button
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="20px"
-                android:id="@+id/btn_action_list"
-                android:textSize="26px"
-                android:text="List Layout页面/List Layout Activity"
-                app:layout_constraintTop_toBottomOf="@id/btn_action_anko"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent" />
-
-        <Button
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="20px"
-                android:id="@+id/btn_action_to_sample"
-                android:textSize="26px"
-                android:text="样例页面/Sample Activity"
-                app:layout_constraintTop_toBottomOf="@id/btn_action_list"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent" />
-</android.support.constraint.ConstraintLayout>
+    <Button
+        android:id="@+id/btn_action_to_sample"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="20px"
+        android:text="样例页面/Sample Activity"
+        android:textSize="26px"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/btn_action_list" />
+</androidx.constraintlayout.widget.ConstraintLayout>

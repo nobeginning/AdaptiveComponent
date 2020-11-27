@@ -1,10 +1,9 @@
 package com.young.sample
 
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.Toolbar
 import android.view.Menu
 import android.view.MenuItem
+import androidx.appcompat.app.AppCompatActivity
 import com.young.adaptive.AdaptiveAssistant
 import com.young.adaptive.AdaptiveComponent
 import kotlinx.android.synthetic.main.activity_main.*
@@ -20,10 +19,6 @@ class MainActivity : AppCompatActivity() {
 
         btn_action_normal.setOnClickListener {
             NormalActivity.launch(this)
-        }
-
-        btn_action_anko.setOnClickListener {
-            AnkoActivity.launch(this)
         }
 
         btn_action_list.setOnClickListener {

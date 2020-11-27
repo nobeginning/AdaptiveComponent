@@ -1,10 +1,10 @@
 package com.young.adaptive.component.typed
 
 import android.os.Build
-import android.support.v7.widget.Toolbar
 import android.util.TypedValue
 import android.view.ViewTreeObserver
 import android.widget.TextView
+import androidx.appcompat.widget.Toolbar
 import com.young.adaptive.AdaptiveComponent
 import com.young.adaptive.component.TypedComponent
 import java.math.BigDecimal
