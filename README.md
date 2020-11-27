@@ -6,7 +6,7 @@ Android自适应布局解决方案
 
 ## 前言
 
-项目地址：[AdaptiveAnkoComponent](https://github.com/nobeginning/AdaptiveAnkoComponent)
+项目地址：[AdaptiveComponent](https://github.com/nobeginning/AdaptiveComponent)
 
 因为之前一直使用的鸿洋的[AndroidAutoLayout](https://github.com/hongyangAndroid/AndroidAutoLayout)（貌似目前停止维护了），所以对这种模式的自适应方案比较认同。但是我是一个JetBrains的粉丝，在学习[Anko](https://github.com/Kotlin/anko)的时候发现这套方案不适用了，于是打算自己来实现一套。
 
