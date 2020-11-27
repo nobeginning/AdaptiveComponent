@@ -16,6 +16,7 @@ import androidx.appcompat.widget.Toolbar
 import com.young.adaptive.component.*
 import com.young.adaptive.component.typed.ToolbarAdaptiveComponent
 import java.math.BigDecimal
+import java.math.RoundingMode
 import java.util.*
 import kotlin.collections.HashMap
 
@@ -23,6 +24,8 @@ import kotlin.collections.HashMap
  * Created by Young on 2017/9/27.
  */
 private const val DEBUG = true
+
+const val DEFAULT_DESIGN_WIDTH = 720
 
 const val PX_1: Int = -10
 const val PX_LINE: Int = -10
@@ -111,7 +114,7 @@ public object AdaptiveComponent {
     fun getZoomRate(context: Context): BigDecimal {
         val screenWidth = getScreenWidth(context)
         val designWidth = getDesignWidth(context)
-        return BigDecimal(screenWidth).divide(BigDecimal(designWidth))
+        return BigDecimal(screenWidth).divide(BigDecimal(designWidth), 4, RoundingMode.HALF_UP)
     }
 
     fun getScreenWidth(context: Context): Int {
@@ -128,12 +131,17 @@ public object AdaptiveComponent {
         if (metaData == null) {
             metaData = ctx.packageManager.getApplicationInfo(ctx.packageName, PackageManager.GET_META_DATA)?.metaData
         }
-        return if (metaData != null && metaData!!.containsKey(META_NAME_DESIGN_WIDTH)) {
-            designWidth = metaData!!.get(META_NAME_DESIGN_WIDTH) as Int
-            designWidth
-        } else {
-            0
+        val finalMetaData = metaData
+        if (finalMetaData==null){
+            designWidth = DEFAULT_DESIGN_WIDTH
+            return designWidth
         }
+        designWidth =  if (finalMetaData.containsKey(META_NAME_DESIGN_WIDTH)) {
+            finalMetaData.get(META_NAME_DESIGN_WIDTH) as Int
+        } else {
+            DEFAULT_DESIGN_WIDTH
+        }
+        return designWidth
     }
 
     fun calculate(zoomRate: BigDecimal, originValue: Int): Int {
