@@ -2,6 +2,7 @@ package com.young.adaptive
 
 import android.app.Activity
 import android.app.Application
+import android.app.Dialog
 import android.content.ComponentCallbacks
 import android.content.Context
 import android.content.ContextWrapper
@@ -11,6 +12,7 @@ import android.os.Bundle
 import android.util.DisplayMetrics
 import android.util.Log
 import android.view.*
+import androidx.annotation.LayoutRes
 import androidx.annotation.StringDef
 import androidx.appcompat.widget.Toolbar
 import com.young.adaptive.component.*
@@ -39,7 +41,7 @@ private const val META_NAME_DESIGN_HEIGHT: String = "com.young.adaptive.designHe
 private const val LOG_TAG: String = "AdaptiveComponent"
 
 object AdaptiveAssistant {
-    fun setContentView(activity: Activity, layoutId: Int) {
+    fun setContentView(activity: Activity, @LayoutRes layoutId: Int) {
         val layout = LayoutInflater.from(activity).inflate(layoutId, null)
         AdaptiveLayoutContext(activity, activity, true).addView(layout, null)
     }
@@ -48,7 +50,12 @@ object AdaptiveAssistant {
         AdaptiveLayoutContext(activity, activity, true).addView(view, null)
     }
 
-    fun adaptive(context: Context, parentView: ViewGroup?, layoutId: Int): View {
+    fun setContentView(dialog: Dialog, @LayoutRes layoutId: Int) {
+        val layout = adaptive(dialog.context, null, layoutId)
+        dialog.setContentView(layout)
+    }
+
+    fun adaptive(context: Context, parentView: ViewGroup?, @LayoutRes layoutId: Int): View {
         val layout = LayoutInflater.from(context).inflate(layoutId, parentView, false)
         return AdaptiveLayoutContext(context, context, false).doAdaptive(context, layout)
     }
@@ -132,11 +139,11 @@ public object AdaptiveComponent {
             metaData = ctx.packageManager.getApplicationInfo(ctx.packageName, PackageManager.GET_META_DATA)?.metaData
         }
         val finalMetaData = metaData
-        if (finalMetaData==null){
+        if (finalMetaData == null) {
             designWidth = DEFAULT_DESIGN_WIDTH
             return designWidth
         }
-        designWidth =  if (finalMetaData.containsKey(META_NAME_DESIGN_WIDTH)) {
+        designWidth = if (finalMetaData.containsKey(META_NAME_DESIGN_WIDTH)) {
             finalMetaData.get(META_NAME_DESIGN_WIDTH) as Int
         } else {
             DEFAULT_DESIGN_WIDTH
