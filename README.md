@@ -81,7 +81,7 @@ In layout xml:
 In Activity:
 
 ```kotlin
-AdaptiveAssistant().setContentView(this, R.layout.activity_xxx)
+AdaptiveAssistant.setContentView(this, R.layout.activity_xxx)
 ```
 
 
